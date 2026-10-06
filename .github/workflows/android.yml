@@ -1,31 +1,96 @@
 name: android
 
+# Builds the child app APK on every push to main (and on demand from the Actions tab).
+#   - Debug APK: always. Download it from the run's "Artifacts" section.
+#   - Release APK: only when signing secrets are set (see below).
+#   - Push a tag like v0.1.0 to also publish the APKs as a GitHub Release.
+#
+# Release signing secrets (Settings > Secrets and variables > Actions):
+#   ANDROID_KEYSTORE_BASE64   base64 of the .jks file   (base64 -w0 omnest.jks)
+#   ANDROID_KEYSTORE_PASSWORD
+#   ANDROID_KEY_ALIAS
+#   ANDROID_KEY_PASSWORD
+# Optional: GOOGLE_SERVICES_JSON (contents of google-services.json) to turn on FCM.
+
 on:
   workflow_dispatch:
   push:
     branches: [main]
+    tags: ["v*"]
     paths: ["android/**", ".github/workflows/android.yml"]
   pull_request:
     paths: ["android/**", ".github/workflows/android.yml"]
 
+permissions:
+  contents: write # needed to create a Release on tags
+
 jobs:
-  build:
+  apk:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: android
+    env:
+      HAS_SIGNING: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug
+
+      - name: Add google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        if: env.GOOGLE_SERVICES_JSON != ''
+        run: echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
+
+      - name: Add release keystore
+        if: env.HAS_SIGNING == 'true'
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/omnest.jks"
+          cat > keystore.properties <<EOF
+          storeFile=$RUNNER_TEMP/omnest.jks
+          storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          EOF
+
+      - name: Test, lint, build debug APK
+        run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug
+
+      - name: Build release APK
+        if: env.HAS_SIGNING == 'true'
+        run: ./gradlew --no-daemon assembleRelease
+
+      - name: Name APKs
+        run: |
+          mkdir -p "$RUNNER_TEMP/apk"
+          version=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
+          sha=$(git rev-parse --short HEAD)
+          cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/apk/omnest-$version-$sha-debug.apk"
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then
+            cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/apk/omnest-$version-$sha-release.apk"
+          fi
+          ls -la "$RUNNER_TEMP/apk"
+
       - uses: actions/upload-artifact@v4
-        if: always()
+        with:
+          name: omnest-apk
+          path: ${{ runner.temp }}/apk/*.apk
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
         with:
           name: android-reports
-          path: |
-            android/app/build/reports/
-            android/app/build/outputs/apk/debug/*.apk
+          path: android/app/build/reports/
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" "$RUNNER_TEMP"/apk/*.apk --title "Omnest ${{ github.ref_name }}" --generate-notes
