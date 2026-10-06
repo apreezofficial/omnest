@@ -24,11 +24,11 @@ Legend: `[BE]` backend - `[AND]` Android child app - `[WEB]` landing/dashboard -
 - [x] `[BE]` Validation helper (required, type, length, enum) used on every endpoint
 - [ ] `[BE]` Logging (Monolog), central exception handler, error tracking
 - [x] `[BE]` PHPUnit tests, CI on push
-- [ ] `[AND]` Kotlin + Compose project (minSdk 26), Hilt, Retrofit/OkHttp, Room, DataStore, WorkManager
+- [x] `[AND]` Kotlin + Compose project (minSdk 26), Hilt, Retrofit/OkHttp, Room, DataStore, WorkManager
 - [ ] `[AND]` FCM messaging only (Firebase project, `google-services.json`, no other Firebase SDKs), build variants (debug/release), signing config, CI build + lint
 - [ ] `[BE]` Pusher Channels app + `pusher/pusher-php-server`; `[WEB]` `pusher-js` client; private channels per parent with a signed auth endpoint
 - [x] `[WEB]` Next.js (TS) + Tailwind project, `next/font` (Bricolage Grotesque, DM Sans, JetBrains Mono), shared components
-- [ ] `[ALL]` Set up Phosphor icons on web and Android
+- [x] `[ALL]` Set up Phosphor icons on web and Android
 
 ## Phase 1 - Accounts and pairing (the spine)
 - [ ] `[BE]` Parent register/login: `password_hash` (Argon2id/bcrypt), opaque API tokens (random 32+ bytes, store only SHA-256 hash, expiry + revoke), email verification, password reset, rate limiting
