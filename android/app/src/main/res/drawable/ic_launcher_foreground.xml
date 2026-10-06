@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Logo mark from the 48-unit grid, scaled into the 108dp adaptive icon safe zone (66dp). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="1.375"
+        android:scaleY="1.375"
+        android:translateX="21"
+        android:translateY="21">
+        <path
+            android:pathData="M14,38V22a10,10 0,0 1,20 0v16"
+            android:strokeColor="#FFFDF7"
+            android:strokeWidth="5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M6,33c8,10 28,10 36,0"
+            android:strokeColor="#FFFDF7"
+            android:strokeWidth="5"
+            android:strokeLineCap="round" />
+        <path
+            android:pathData="M28.5,27m-3.5,0a3.5,3.5 0,1 1,7 0a3.5,3.5 0,1 1,-7 0"
+            android:fillColor="#F5A524" />
+    </group>
+</vector>

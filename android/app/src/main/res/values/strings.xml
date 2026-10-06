@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Omnest</string>
+    <string name="tagline">Limits that talk back.</string>
+    <string name="welcome_title">Hi! Let\'s set up this phone.</string>
+    <string name="welcome_body">A parent will give you a 6-digit code. It links this phone to their Omnest account.</string>
+    <string name="welcome_cta">I have a code</string>
+    <string name="notification_channel_general">General</string>
+</resources>

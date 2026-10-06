@@ -14,20 +14,20 @@ Legend: `[BE]` backend - `[AND]` Android child app - `[WEB]` landing/dashboard -
 ## Phase 0 - Foundations (do first)
 - [ ] `[ALL]` Lock name (Omnest) and check availability: domain, Play Store name, social handles, trademark search
 - [ ] `[ALL]` Logo (nest/door mark + accent dot), app icon, favicon
-- [ ] `[ALL]` Implement design tokens from `specs.md` (Tailwind config, Compose theme)
+- [x] `[ALL]` Implement design tokens from `specs.md` (Tailwind config, Compose theme)
 - [ ] `[ALL]` Git repos + branching + issue board
-- [ ] `[BE]` Project structure: `public/index.php` front controller, `src/` (Controllers, Services, Repositories, Middleware), `config/`, `migrations/`; Composer + PSR-4 autoload
-- [ ] `[BE]` Small router (method + path + params, route groups, `/api/v1`), request/response helpers, standard JSON success/error format
-- [ ] `[BE]` PDO wrapper: prepared statements only, transactions, utf8mb4, env-based config (`vlucas/phpdotenv`)
-- [ ] `[BE]` Simple migration runner (numbered SQL files + `migrations` table)
-- [ ] `[BE]` Middleware pipeline: CORS, JSON body parsing, auth (parent), auth (device), rate limiter, error handler
-- [ ] `[BE]` Validation helper (required, type, length, enum) used on every endpoint
+- [x] `[BE]` Project structure: `public/index.php` front controller, `src/` (Controllers, Services, Repositories, Middleware), `config/`, `migrations/`; Composer + PSR-4 autoload
+- [x] `[BE]` Small router (method + path + params, route groups, `/api/v1`), request/response helpers, standard JSON success/error format
+- [x] `[BE]` PDO wrapper: prepared statements only, transactions, utf8mb4, env-based config (`vlucas/phpdotenv`)
+- [x] `[BE]` Simple migration runner (numbered SQL files + `migrations` table)
+- [x] `[BE]` Middleware pipeline: CORS, JSON body parsing, auth (parent), auth (device), rate limiter, error handler
+- [x] `[BE]` Validation helper (required, type, length, enum) used on every endpoint
 - [ ] `[BE]` Logging (Monolog), central exception handler, error tracking
-- [ ] `[BE]` PHPUnit tests, CI on push
+- [x] `[BE]` PHPUnit tests, CI on push
 - [ ] `[AND]` Kotlin + Compose project (minSdk 26), Hilt, Retrofit/OkHttp, Room, DataStore, WorkManager
 - [ ] `[AND]` FCM messaging only (Firebase project, `google-services.json`, no other Firebase SDKs), build variants (debug/release), signing config, CI build + lint
 - [ ] `[BE]` Pusher Channels app + `pusher/pusher-php-server`; `[WEB]` `pusher-js` client; private channels per parent with a signed auth endpoint
-- [ ] `[WEB]` Next.js (TS) + Tailwind project, `next/font` (Bricolage Grotesque, DM Sans, JetBrains Mono), shared components
+- [x] `[WEB]` Next.js (TS) + Tailwind project, `next/font` (Bricolage Grotesque, DM Sans, JetBrains Mono), shared components
 - [ ] `[ALL]` Set up Phosphor icons on web and Android
 
 ## Phase 1 - Accounts and pairing (the spine)
