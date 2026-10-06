@@ -1,0 +1,8 @@
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
+minimumReleaseAgeExclude:
+  - '@typescript-eslint/eslint-plugin@8.71.1'
+  - '@typescript-eslint/project-service@8.71.1'
+  - '@typescript-eslint/tsconfig-utils@8.71.1'
+  - '@typescript-eslint/visitor-keys@8.71.1'
