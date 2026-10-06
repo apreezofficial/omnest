@@ -1,0 +1,36 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Env files (commit only *.example)
+.env
+.env.*
+!.env.example
+
+# Backend
+backend/vendor/
+backend/storage/logs/*
+!backend/storage/logs/.gitkeep
+backend/.phpunit.cache/
+
+# Web
+web/node_modules/
+web/.next/
+web/out/
+web/next-env.d.ts
+web/*.tsbuildinfo
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.kotlin/
+android/captures/
+android/app/google-services.json
+android/keystore.properties
+*.jks
+*.keystore
