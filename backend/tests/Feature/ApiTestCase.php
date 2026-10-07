@@ -82,11 +82,15 @@ abstract class ApiTestCase extends TestCase
             $headers['authorization'] = 'Bearer ' . $token;
         }
 
+        // Split "?a=b" off the path the way Request::fromGlobals() does for real requests.
+        $query = [];
+        parse_str((string) parse_url($path, PHP_URL_QUERY), $query);
+
         return $this->app->handle(new Request(
             $method,
-            $path,
+            (string) parse_url($path, PHP_URL_PATH),
             $headers,
-            [],
+            $query,
             $body === null ? '' : json_encode($body, JSON_THROW_ON_ERROR),
             $ip,
         ));

@@ -83,6 +83,11 @@ kotlin {
     jvmToolchain(17)
 }
 
+ksp {
+    // Committed schema JSON lets us verify Room migrations later.
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

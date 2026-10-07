@@ -21,7 +21,35 @@ interface OmnestApi {
 
     @PUT("device/fcm-token")
     suspend fun updateFcmToken(@Header("Authorization") auth: String, @Body body: FcmTokenRequest): Response<Unit>
+
+    @POST("device/usage")
+    suspend fun uploadUsage(@Header("Authorization") auth: String, @Body body: UsageUpload): Response<ApiResponse<UsageAccepted>>
+
+    @PUT("device/apps")
+    suspend fun syncApps(@Header("Authorization") auth: String, @Body body: AppsUpload): Response<Unit>
 }
+
+@Serializable
+data class UsageUpload(val timezone: String, val days: List<UsageDayDto>)
+
+@Serializable
+data class UsageDayDto(val date: String, val apps: List<AppSecondsDto>)
+
+@Serializable
+data class AppSecondsDto(@SerialName("package") val packageName: String, val seconds: Int)
+
+@Serializable
+data class UsageAccepted(val accepted: List<String>)
+
+@Serializable
+data class AppsUpload(val apps: List<InstalledAppDto>)
+
+@Serializable
+data class InstalledAppDto(
+    @SerialName("package") val packageName: String,
+    val label: String,
+    val system: Boolean,
+)
 
 @Serializable
 data class PairRequest(

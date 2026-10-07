@@ -4,8 +4,9 @@ import { CaretRight, DeviceMobile, Plus } from "@phosphor-icons/react/dist/ssr";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { Notice } from "@/components/ui/Notice";
-import { api, type Child } from "@/lib/api";
+import { api, type Child, type UsageDay } from "@/lib/api";
 import { tierLabel } from "@/lib/children";
+import { formatDuration } from "@/lib/format";
 import { requireUser } from "@/lib/session";
 import { ChildAvatar } from "./ChildAvatar";
 
@@ -19,6 +20,13 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   const { welcome } = await searchParams;
   const res = await api<Child[]>("/children", { token });
   const children = res.ok ? res.data : [];
+  const todays = await Promise.all(
+    children.map((c) => (c.device_count > 0 ? api<UsageDay>(`/children/${c.id}/usage/day`, { token }) : null)),
+  );
+  const todayFor = (i: number) => {
+    const r = todays[i];
+    return r?.ok && r.data.last_synced_at ? r.data.total_seconds : null;
+  };
 
   return (
     <>
@@ -51,7 +59,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         </Card>
       ) : (
         <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {children.map((child) => (
+          {children.map((child, i) => (
             <li key={child.id}>
               <Link
                 href={`/dashboard/children/${child.id}`}
@@ -60,7 +68,14 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                 <Card featured className="flex items-center gap-4 group-hover:bg-cream-200 dark:group-hover:bg-border">
                   <ChildAvatar name={child.name} avatar={child.avatar} />
                   <div className="flex min-w-0 flex-1 flex-col gap-2">
-                    <h2 className="type-h4 truncate">{child.name}</h2>
+                    <div className="flex items-baseline justify-between gap-2">
+                      <h2 className="type-h4 truncate">{child.name}</h2>
+                      {todayFor(i) !== null && (
+                        <span className="shrink-0 text-body-sm text-text-muted">
+                          <span className="font-mono font-bold text-text">{formatDuration(todayFor(i)!)}</span> today
+                        </span>
+                      )}
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       <Chip tone="green">{tierLabel(child.age_tier)}</Chip>
                       <Chip tone={child.device_count > 0 ? "sky" : "sun"}>

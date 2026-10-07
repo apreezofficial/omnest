@@ -36,8 +36,18 @@ Defaults: `127.0.0.1:3306`, user `root`, no password. Override with `TEST_DB_HOS
 | POST | `/device/pair` | - | code + phone info → per-device token (10 tries / 10 min / IP) |
 | GET | `/device/me` | device | this phone + its child |
 | PUT | `/device/fcm-token` | device | push token |
+| POST | `/device/usage` | device | `{timezone, days: [{date, apps: [{package, seconds}]}]}`, up to 8 days, absolute totals (safe to resend) |
+| PUT | `/device/apps` | device | full launchable-app list; missing apps are marked removed |
+| GET | `/children/{id}/usage/day?date=` | parent | one day (default today in the child's timezone), top 20 apps |
+| GET | `/children/{id}/usage/range?days=7\|14\|30` | parent | daily totals (gaps filled with 0), average over days with data, top 5 apps |
 
 Tokens: parent `omp_…` (30-day sliding expiry), device `omd_…` (until unpaired), email links `omx_…`.
+
+## Scheduled jobs
+
+```cron
+15 3 * * * php /path/to/backend/bin/cleanup.php   # usage older than 90 days, expired tokens/codes/rate limits
+```
 
 ## Layout
 

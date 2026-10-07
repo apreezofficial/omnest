@@ -1,6 +1,9 @@
 package com.omnest.child.data
 
+import android.content.Context
 import android.os.Build
+import com.omnest.child.usage.UsageSyncWorker
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.omnest.child.BuildConfig
 import com.omnest.child.data.api.OmnestApi
 import com.omnest.child.data.api.PairRequest
@@ -19,6 +22,7 @@ sealed interface PairOutcome {
 
 @Singleton
 class PairingRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val api: OmnestApi,
     private val session: DeviceSession,
     private val pushTokens: PushTokens,
@@ -51,6 +55,8 @@ class PairingRepository @Inject constructor(
                 ageTier = result.child.ageTier,
             )
             session.save(device)
+            UsageSyncWorker.schedule(context)
+            UsageSyncWorker.runNow(context)
             return PairOutcome.Paired(device)
         }
 

@@ -13,6 +13,8 @@ return [
     // Where links in emails point (verify email, reset password).
     'dashboard_url' => Env::get('DASHBOARD_URL', 'http://localhost:3000'),
     'cors_origins' => Env::list('CORS_ALLOWED_ORIGINS'),
+    // Used for a child's "today" until their phone reports its own timezone.
+    'default_timezone' => Env::get('DEFAULT_TIMEZONE', 'Africa/Lagos'),
 
     'db' => [
         'host' => Env::get('DB_HOST', '127.0.0.1'),

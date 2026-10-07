@@ -83,3 +83,25 @@ export type Device = {
 };
 
 export type PairingCode = { code: string; expires_at: string; qr_payload: string };
+
+export type AppUsage = { package: string; label: string; seconds: number };
+
+export type UsageDay = {
+  date: string;
+  is_today: boolean;
+  timezone: string;
+  total_seconds: number;
+  apps: AppUsage[];
+  last_synced_at: string | null;
+};
+
+export type UsageRange = {
+  from: string;
+  to: string;
+  timezone: string;
+  days: { date: string; total_seconds: number }[];
+  total_seconds: number;
+  average_seconds: number;
+  top_apps: AppUsage[];
+  last_synced_at: string | null;
+};

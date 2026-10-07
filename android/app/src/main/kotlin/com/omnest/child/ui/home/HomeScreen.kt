@@ -31,6 +31,7 @@ import com.adamglin.PhosphorIcons
 import com.adamglin.phosphoricons.Bold
 import com.adamglin.phosphoricons.bold.WarningCircle
 import com.omnest.child.permissions.Requirement
+import com.omnest.child.usage.UsageSyncWorker
 import com.omnest.child.ui.components.ButtonVariant
 import com.omnest.child.ui.components.LogoMark
 import com.omnest.child.ui.components.OmnestButton
@@ -48,6 +49,7 @@ fun HomeScreen(childName: String, onFixPermissions: (List<Requirement>) -> Unit)
     // Re-check every time the app comes to the front: permissions can be revoked in Settings.
     LifecycleResumeEffect(Unit) {
         missing = Requirement.missing(context)
+        UsageSyncWorker.runNow(context) // fresh numbers for the parent whenever the app is opened
         onPauseOrDispose { }
     }
 

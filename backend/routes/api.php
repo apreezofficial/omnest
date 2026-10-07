@@ -6,6 +6,7 @@ use Omnest\Controllers\AuthController;
 use Omnest\Controllers\ChildController;
 use Omnest\Controllers\DeviceController;
 use Omnest\Controllers\HealthController;
+use Omnest\Controllers\UsageController;
 use Omnest\Http\Router;
 
 return static function (Router $router): void {
@@ -38,6 +39,8 @@ return static function (Router $router): void {
             $r->delete('/children/{id}', [ChildController::class, 'destroy']);
             $r->get('/children/{id}/devices', [ChildController::class, 'devices']);
             $r->post('/children/{id}/pairing-codes', [ChildController::class, 'createPairingCode']);
+            $r->get('/children/{id}/usage/day', [UsageController::class, 'day']);
+            $r->get('/children/{id}/usage/range', [UsageController::class, 'range']);
             $r->delete('/devices/{id}', [DeviceController::class, 'revoke']);
         });
 
@@ -48,6 +51,8 @@ return static function (Router $router): void {
             $r->group(['middleware' => ['auth.device']], static function (Router $r): void {
                 $r->get('/me', [DeviceController::class, 'me']);
                 $r->put('/fcm-token', [DeviceController::class, 'updateFcmToken']);
+                $r->post('/usage', [UsageController::class, 'ingest']);
+                $r->put('/apps', [UsageController::class, 'apps']);
             });
         });
     });

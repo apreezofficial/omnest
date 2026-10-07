@@ -7,8 +7,11 @@ import { api, type Child, type Device } from "@/lib/api";
 import { tierLabel } from "@/lib/children";
 import { requireUser } from "@/lib/session";
 import { ChildAvatar } from "../../ChildAvatar";
+import { Suspense } from "react";
+import { Card } from "@/components/ui/Card";
 import { DeviceList } from "./DeviceList";
 import { PairDevice } from "./PairDevice";
+import { RANGES, UsageOverview, type RangeDays } from "./UsageOverview";
 
 export async function generateMetadata({ params }: PageProps<"/dashboard/children/[id]">): Promise<Metadata> {
   const { id } = await params;
@@ -18,7 +21,8 @@ export async function generateMetadata({ params }: PageProps<"/dashboard/childre
 }
 
 export default async function ChildPage({ params, searchParams }: PageProps<"/dashboard/children/[id]">) {
-  const [{ id }, { pair }] = await Promise.all([params, searchParams]);
+  const [{ id }, { pair, range: rangeParam }] = await Promise.all([params, searchParams]);
+  const range = (RANGES.find((r) => String(r) === rangeParam) ?? 7) as RangeDays;
   const { token } = await requireUser();
 
   const [childRes, devicesRes] = await Promise.all([
@@ -52,6 +56,15 @@ export default async function ChildPage({ params, searchParams }: PageProps<"/da
           Edit
         </Link>
       </div>
+
+      <section className="flex flex-col gap-4" aria-labelledby="usage-heading">
+        <h2 id="usage-heading" className="type-h3">
+          Screen time
+        </h2>
+        <Suspense fallback={<Card className="h-64 animate-pulse" aria-busy="true" aria-label="Loading screen time" />}>
+          <UsageOverview childId={child.id} childName={child.name} token={token} range={range} hasDevice={devices.length > 0} />
+        </Suspense>
+      </section>
 
       <section className="flex flex-col gap-4" aria-labelledby="phones-heading">
         <h2 id="phones-heading" className="type-h3">

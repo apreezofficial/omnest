@@ -1,7 +1,9 @@
 package com.omnest.child.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -14,6 +16,8 @@ import com.omnest.child.ui.home.HomeScreen
 import com.omnest.child.ui.pairing.PairedScreen
 import com.omnest.child.ui.pairing.PairingScreen
 import com.omnest.child.ui.setup.SetupWizardScreen
+import com.omnest.child.usage.UsageSyncWorker
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.serialization.Serializable
 
 @Serializable data object WelcomeRoute
@@ -30,6 +34,13 @@ fun OmnestNavHost(session: DeviceSession) {
     val paired by session.current.collectAsStateWithLifecycle()
     // Decided once at launch; pairing mid-session navigates explicitly instead of rebuilding the graph.
     val start: Any = remember { if (session.current.value != null) HomeRoute else WelcomeRoute }
+
+    // Unpaired by the parent while the app was open: back to the start.
+    LaunchedEffect(paired) {
+        if (paired == null && nav.currentDestination?.hasRoute(HomeRoute::class) == true) {
+            nav.navigate(WelcomeRoute) { popUpTo(nav.graph.id) { inclusive = true } }
+        }
+    }
 
     NavHost(navController = nav, startDestination = start) {
         composable<WelcomeRoute> {
@@ -59,9 +70,11 @@ fun OmnestNavHost(session: DeviceSession) {
             val only = entry.toRoute<SetupRoute>().only
                 .mapNotNull { name -> Requirement.entries.firstOrNull { it.name == name } }
                 .ifEmpty { null }
+            val context = LocalContext.current
             SetupWizardScreen(
                 only = only,
                 onFinished = {
+                    UsageSyncWorker.runNow(context) // usage access may have just been granted
                     nav.navigate(HomeRoute) {
                         popUpTo(nav.graph.id) { inclusive = true }
                     }
