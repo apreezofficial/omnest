@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/Button";
 
@@ -13,10 +14,13 @@ export default function Home() {
           <strong className="text-text">Knock</strong> to ask for more, and you answer in one tap.
         </p>
       </div>
-      <div>
+      <div className="flex flex-wrap items-center gap-4">
         <Button variant="primary" size="lg" disabled>
           Waitlist opens soon
         </Button>
+        <Link href="/login" className="type-label inline-flex min-h-12 items-center px-2 text-primary underline-offset-4 hover:underline">
+          Parent sign in
+        </Link>
       </div>
     </main>
   );

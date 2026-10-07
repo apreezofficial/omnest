@@ -17,7 +17,7 @@ use Omnest\Exceptions\ValidationException;
  *       'note'     => 'nullable|string|max:140',
  *   ]);
  *
- * Supported: required, nullable, string, int, numeric, bool, array, email, date (Y-m-d),
+ * Supported: required, nullable, raw (skip trimming, for passwords), string, int, numeric, bool, array, email, date (Y-m-d),
  * min:n, max:n (length for strings, value for numbers, count for arrays), in:a,b,c, regex:/.../
  * Returns only the declared fields; throws ValidationException on failure.
  */
@@ -35,8 +35,12 @@ final class Validator
 
         foreach ($rules as $field => $ruleString) {
             $fieldRules = self::parse($ruleString);
-            $present = array_key_exists($field, $data) && $data[$field] !== null && $data[$field] !== '';
             $value = $data[$field] ?? null;
+            // Trim before checking so pasted " a@b.co " passes; `raw` (passwords) keeps input as typed.
+            if (is_string($value) && !array_key_exists('raw', $fieldRules)) {
+                $value = trim($value);
+            }
+            $present = array_key_exists($field, $data) && $value !== null && $value !== '';
 
             if (!$present) {
                 if (array_key_exists('required', $fieldRules)) {
@@ -56,7 +60,7 @@ final class Validator
             }
 
             if ($fieldErrors === []) {
-                $clean[$field] = is_string($value) ? trim($value) : $value;
+                $clean[$field] = $value;
             } else {
                 $errors[$field] = $fieldErrors;
             }
@@ -91,7 +95,7 @@ final class Validator
         $isNumeric = array_key_exists('int', $all) || array_key_exists('numeric', $all);
 
         return match ($rule) {
-            'required', 'nullable' => null,
+            'required', 'nullable', 'raw' => null,
             'string' => is_string($value) ? null : 'Must be text.',
             'int' => (is_int($value) || (is_string($value) && preg_match('/^-?\d+$/', $value) === 1)) ? null : 'Must be a whole number.',
             'numeric' => is_numeric($value) ? null : 'Must be a number.',

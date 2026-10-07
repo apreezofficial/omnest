@@ -123,5 +123,9 @@ dependencies {
 
     implementation(libs.phosphor.icons)
 
+    // QR scanning through Google Play services: no camera permission, tiny APK cost.
+    implementation(libs.code.scanner)
+    implementation(libs.kotlinx.coroutines.play.services)
+
     testImplementation(libs.junit)
 }

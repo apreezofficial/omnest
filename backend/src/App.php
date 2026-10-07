@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace Omnest;
 
 use Dotenv\Dotenv;
+use Omnest\Auth\DeviceTokenResolver;
+use Omnest\Auth\ParentTokenResolver;
 use Omnest\Database\Database;
+use Omnest\Mail\LogMailer;
+use Omnest\Mail\Mailer;
+use Omnest\Mail\ResendMailer;
 use Omnest\Http\Middleware\Authenticate;
 use Omnest\Http\Middleware\Cors;
 use Omnest\Http\Middleware\ErrorHandler;
@@ -15,6 +20,7 @@ use Omnest\Http\Pipeline;
 use Omnest\Http\Request;
 use Omnest\Http\Response;
 use Omnest\Http\Router;
+use Omnest\Support\Config;
 use Omnest\Support\Container;
 use Omnest\Support\DatabaseRateLimiter;
 use Omnest\Support\LoggerFactory;
@@ -57,24 +63,32 @@ final class App
         $c = $this->container;
         $c->instance(self::class, $this);
 
+        $c->instance(Config::class, new Config($this->config));
         $c->set(Database::class, fn () => Database::mysql($this->config['db']));
         $c->set(LoggerInterface::class, function () {
             $path = $this->config['log']['path'];
-            if (!str_starts_with($path, '/') && preg_match('/^[A-Za-z]:[\\\\\/]/', $path) !== 1) {
-                $path = $this->basePath . '/' . $path;
-            }
+            $absolute = str_starts_with($path, '/') || str_contains($path, '://') || preg_match('/^[A-Za-z]:[\\\\\/]/', $path) === 1;
 
-            return LoggerFactory::create($path, $this->config['log']['level']);
+            return LoggerFactory::create($absolute ? $path : $this->basePath . '/' . $path, $this->config['log']['level']);
         });
         $c->set(RateLimiter::class, fn (Container $c) => new DatabaseRateLimiter($c->get(Database::class)));
+        $c->set(Mailer::class, fn (Container $c) => match ($this->config['mail']['driver'] ?? 'log') {
+            'resend' => new ResendMailer($this->config['mail']['resend_key'], $this->config['mail']['from']),
+            default => new LogMailer($c->get(LoggerInterface::class)),
+        });
+        $c->set('tokens.parent', fn (Container $c) => $c->get(ParentTokenResolver::class));
+        $c->set('tokens.device', fn (Container $c) => $c->get(DeviceTokenResolver::class));
 
         $c->set(Router::class, function (Container $c) {
             $router = new Router(fn (string $class) => $c->get($class));
+            $limiter = fn () => $c->get(RateLimiter::class);
 
             $router->alias('auth.parent', fn () => new Authenticate($c->get('tokens.parent'), 'user'));
             $router->alias('auth.device', fn () => new Authenticate($c->get('tokens.device'), 'device'));
-            $router->alias('throttle.auth', fn () => new RateLimit($c->get(RateLimiter::class), 'auth', 10, 60));
-            $router->alias('throttle.api', fn () => new RateLimit($c->get(RateLimiter::class), 'api', 120, 60));
+            $router->alias('throttle.api', fn () => new RateLimit($limiter(), 'api', 120, 60));
+            $router->alias('throttle.auth', fn () => new RateLimit($limiter(), 'auth', 10, 60));
+            // Pairing codes are 6 digits: keep guessing slow (10 tries per 10 minutes per IP).
+            $router->alias('throttle.pair', fn () => new RateLimit($limiter(), 'pair', 10, 600));
 
             (require $this->basePath . '/routes/api.php')($router);
 

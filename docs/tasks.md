@@ -31,15 +31,15 @@ Legend: `[BE]` backend - `[AND]` Android child app - `[WEB]` landing/dashboard -
 - [x] `[ALL]` Set up Phosphor icons on web and Android
 
 ## Phase 1 - Accounts and pairing (the spine)
-- [ ] `[BE]` Parent register/login: `password_hash` (Argon2id/bcrypt), opaque API tokens (random 32+ bytes, store only SHA-256 hash, expiry + revoke), email verification, password reset, rate limiting
-- [ ] `[BE]` Mailer via PHPMailer / provider API (Resend, Mailgun, SES)
-- [ ] `[BE]` Tables: users, children, devices
-- [ ] `[BE]` CRUD children (name, birth date / age tier: kid / preteen / teen, avatar)
-- [ ] `[BE]` Pairing: short-lived 6-digit code + QR payload, expiry, attempt rate limit
-- [ ] `[BE]` Pair endpoint issues a **per-device token** (never the parent's login); revoke/unpair
-- [ ] `[BE]` Store and refresh FCM tokens per device
-- [ ] `[WEB]` Dashboard auth pages (login, register, reset)
-- [ ] `[WEB]` Add child + "Pair a device" flow (shows code + QR)
+- [x] `[BE]` Parent register/login: `password_hash` (Argon2id/bcrypt), opaque API tokens (random 32+ bytes, store only SHA-256 hash, expiry + revoke), email verification, password reset, rate limiting
+- [x] `[BE]` Mailer via PHPMailer / provider API (Resend, Mailgun, SES)
+- [x] `[BE]` Tables: users, children, devices
+- [x] `[BE]` CRUD children (name, birth date / age tier: kid / preteen / teen, avatar)
+- [x] `[BE]` Pairing: short-lived 6-digit code + QR payload, expiry, attempt rate limit
+- [x] `[BE]` Pair endpoint issues a **per-device token** (never the parent's login); revoke/unpair
+- [x] `[BE]` Store and refresh FCM tokens per device
+- [x] `[WEB]` Dashboard auth pages (login, register, reset)
+- [x] `[WEB]` Add child + "Pair a device" flow (shows code + QR)
 - [ ] `[AND]` Welcome screen + pairing screen (6-box code input, QR scan)
 - [ ] `[AND]` Store device token in EncryptedSharedPreferences
 - [ ] `[AND]` Permission wizard, one per screen with plain-language reason: Usage Access, Overlay, Device Admin, Notifications, Battery optimization exemption, (Accessibility only if needed)

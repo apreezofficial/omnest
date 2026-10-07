@@ -1,6 +1,7 @@
 package com.omnest.child.di
 
 import com.omnest.child.BuildConfig
+import com.omnest.child.data.api.OmnestApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,4 +46,8 @@ object NetworkModule {
         .client(client)
         .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
         .build()
+
+    @Provides
+    @Singleton
+    fun omnestApi(retrofit: Retrofit): OmnestApi = retrofit.create(OmnestApi::class.java)
 }

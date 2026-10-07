@@ -19,6 +19,8 @@ securityCrypto = "1.1.0"
 firebaseBom = "34.19.0"
 googleServices = "4.5.0"
 phosphor = "1.0.0"
+codeScanner = "16.1.0"
+coroutinesPlayServices = "1.11.0"
 junit = "4.13.2"
 
 [libraries]
@@ -59,6 +61,8 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 
 phosphor-icons = { module = "com.adamglin:phosphor-icon", version.ref = "phosphor" }
+code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "codeScanner" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutinesPlayServices" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
 

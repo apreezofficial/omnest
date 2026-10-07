@@ -51,6 +51,19 @@ final class ValidatorTest extends TestCase
         self::assertSame(['name' => 'Ọmọ'], Validator::validate(['name' => 'Ọmọ'], ['name' => 'string|max:3']));
     }
 
+    public function testTrimsBeforeCheckingButKeepsRawFieldsAsTyped(): void
+    {
+        $clean = Validator::validate(
+            ['email' => '  ada@example.com ', 'password' => ' pass word '],
+            ['email' => 'required|email', 'password' => 'required|raw|string|min:8'],
+        );
+
+        self::assertSame(['email' => 'ada@example.com', 'password' => ' pass word '], $clean);
+
+        $this->expectException(ValidationException::class);
+        Validator::validate(['name' => '   '], ['name' => 'required|string']);
+    }
+
     public function testRegex(): void
     {
         self::assertSame(['code' => '123456'], Validator::validate(['code' => '123456'], ['code' => 'required|regex:/^\d{6}$/']));
